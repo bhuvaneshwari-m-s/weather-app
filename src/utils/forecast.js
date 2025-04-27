@@ -1,19 +1,22 @@
-const request = require('request')
-const forecast = (latitude, longitude, callback) => {
-    const url = 'http://api.weatherstack.com/current?access_key=abcf875738d91e640d4874e8f9224227&query='+latitude+','+ longitude
-    request({url : url , json : true}, (error , { body }) => {
-        if(error)
-        {
-            callback('Unable to connect to weather service!', undefined)
-        }
-        else if(body.error){
-            callback('Unable to find the location!', undefined)
-        }
-        else
-        {
-            callback(undefined, body.current.weather_descriptions[0] + '. It is currently ' + body.current.temperature + ' degrees outside. It feels like '  + body.current.feelslike + ' and the humidity is ' + body.current.humidity + ' percent')
-        }
-    })
-} 
+const request = require('request');
 
-module.exports = forecast 
+const forecast = (latitude, longitude, callback) => {
+    // Correct URL formatting for WeatherAPI
+    const url = `http://api.weatherapi.com/v1/current.json?key=24e07e58d7dd4038bf535103252704&q=${latitude},${longitude}`;
+
+    request({ url: url, json: true }, (error,  response ) => {
+        if (error) {
+            return callback('Unable to connect to weather service!', undefined);
+        } else if (response.body.error) {
+            callback('Unable to find the location!', undefined);
+        } else {
+
+            // Sending the formatted weather description to the callback
+            callback(undefined, 
+                `${response.body.current.condition.text}. It is currently ${response.body.current.temp_c}°C outside. It feels like ${response.body.current.feelslike_c}°C`
+            );
+        }
+    });
+};
+
+module.exports = forecast;
